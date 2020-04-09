@@ -25,23 +25,20 @@ class BarcodeServiceProvider extends ServiceProvider
             dirname(__DIR__) . '/config/barcode.php' => config_path('barcode.php')
         ], 'config');
 
-        $repo = app(BarcodeRepository::class);
-        if (!$repo->getPrefix()) {
-            $repo->setPrefix(config('barcode.ean'));
-        }
+        $this->mergeConfigFrom(dirname(__DIR__) . '/config/barcode.php', 'barcode');
 
         Event::listen(BarcodeCounterUpdated::class, RemainingBarcodesAvailable::class);
     }
 
     public function register()
     {
-        dd(config('barcode'));
-//        $this->app->bind(BarcodeRepository::class, function () {
-//            $redis      = app(Connection::class);
-//            $counterKey = config('barcode.keys.counter', 'barcode.counter');
-//            $prefixKey  = config('barcode.keys.prefix', 'barcode.prefix');
-//
-//            return new BarcodeRepository($redis, $counterKey, $prefixKey);
-//        });
+        $this->app->singleton(BarcodeRepository::class, function () {
+            $redis      = app(Connection::class);
+            $counterKey = config('barcode.keys.counter', 'barcode.counter');
+            $prefixKey  = config('barcode.keys.prefix', 'barcode.prefix');
+            $channelKey = config('barcode.keys.channel', 'barcode.channel');
+
+            return new BarcodeRepository($redis, $counterKey, $prefixKey, $channelKey);
+        });
     }
 }

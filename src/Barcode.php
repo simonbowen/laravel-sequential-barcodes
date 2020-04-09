@@ -4,19 +4,19 @@ namespace SimonBowen\Barcode;
 
 class Barcode
 {
-    protected int $prefix;
+    public string $prefix;
 
-    protected int $number;
+    public int $number;
 
-    protected string $ean;
+    public string $ean;
 
     const LENGTH = 13;
 
-    public function __construct(int $prefix, int $number)
+    public function __construct(string $prefix, int $number)
     {
         $this->prefix = $prefix;
         $this->number = $number;
-        $this->ean    = $this->formatEan();
+        $this->ean = $this->formatEan();
 
         $this->validateLength();
     }
@@ -54,10 +54,10 @@ class Barcode
 
     public function remainingCodes()
     {
-        $space = 12 - strlen((string) $this->prefix);
-        $maximum = (int) str_repeat('9', $space);
+        $space = 12 - strlen($this->prefix);
+        $maximum = (int)str_repeat('9', $space);
 
-        return $maximum - (int) $this->number;
+        return $maximum - (int)$this->number;
     }
 
     public function getEan()

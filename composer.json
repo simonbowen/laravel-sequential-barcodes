@@ -1,0 +1,28 @@
+{
+    "name": "simonbowen/sequential-barcodes",
+    "description": "Laravel package to sequentially generate EAN barcodes atomically using Redis",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Simon Bowen",
+            "email": "simon@urbantoad.co.uk"
+        }
+    ],
+    "require": {
+        "illuminate/support": "^7.4",
+        "illuminate/config": "^7.4",
+        "illuminate/console": "^7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "SimonBowen\\Barcode\\": "./src"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "SimonBowen\\Barcode\\BarcodeServiceProvider"
+            ]
+        }
+    }
+}

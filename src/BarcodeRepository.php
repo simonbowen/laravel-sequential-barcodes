@@ -10,12 +10,14 @@ class BarcodeRepository
 
     protected string $counterKey;
     protected string $prefixKey;
+    protected string $channelKey;
 
-    public function __construct(Connection $redis, string $counterKey, string $prefixKey)
+    public function __construct(Connection $redis, string $counterKey, string $prefixKey, string $channelKey)
     {
         $this->redis = $redis;
         $this->counterKey = $counterKey;
         $this->prefixKey = $prefixKey;
+        $this->channelKey = $channelKey;
     }
 
     /**
@@ -26,7 +28,10 @@ class BarcodeRepository
     public function next()
     {
         $next = $this->redis->command('INCR', [$this->counterKey]);
-        $this->redis->publish('ean13.barcode.counter.channel', $next);
+        $this->redis->publish($this->channelKey, json_encode([
+            'counter' => $next,
+            'prefix' => $this->getPrefix(),
+        ]));
         return new Barcode($this->getPrefix(), $next);
     }
 
@@ -47,7 +52,7 @@ class BarcodeRepository
      */
     public function getPrefix()
     {
-        return $this->redis->get($this->prefixKey,);
+        return $this->redis->get($this->prefixKey);
     }
 
     /**

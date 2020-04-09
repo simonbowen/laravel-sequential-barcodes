@@ -2,6 +2,7 @@
 
 namespace SimonBowen\Barcode\Commands;
 
+use Illuminate\Config\Repository;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Redis\Connection;
 
@@ -26,10 +27,11 @@ class BarcodeMonitor extends Command
      *
      * @param Connection $redis
      */
-    public function handle(Connection $redis)
+    public function handle(Connection $redis, Repository $config)
     {
-        $redis->subscribe(['ean13.barcode.counter.channel'], function ($message) {
-            BarcodeCounterUpdated::dispatch($message);
+        $redis->subscribe([$config->get('barcode.keys.channel')], function ($message) {
+            $message = json_decode($message, true);
+            BarcodeCounterUpdated::dispatch($message['prefix'], $message['counter']);
         });
     }
 }

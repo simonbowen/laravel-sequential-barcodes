@@ -15,9 +15,11 @@ class BarcodeCounterUpdated
     use Dispatchable;
 
     public string $counter;
+    public string $prefix;
 
-    public function __construct(string $counter)
+    public function __construct(string $prefix, string $counter)
     {
+        $this->prefix = $prefix;
         $this->counter = $counter;
     }
 }

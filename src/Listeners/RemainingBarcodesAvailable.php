@@ -3,18 +3,18 @@
 namespace SimonBowen\Barcode\Listeners;
 
 use Illuminate\Support\Facades\Log;
+use Illuminate\Config\Repository as Config;
 
 use SimonBowen\Barcode\Barcode;
 use SimonBowen\Barcode\Events\BarcodeCounterUpdated;
-use SimonBowen\Barcode\BarcodeRepository;
 
 class RemainingBarcodesAvailable
 {
-    protected BarcodeRepository $repository;
+    protected Config $config;
 
-    public function __construct(BarcodeRepository $repository)
+    public function __construct(Config $config)
     {
-        $this->repository = $repository;
+        $this->config = $config;
     }
 
     /**
@@ -24,13 +24,12 @@ class RemainingBarcodesAvailable
      */
     public function handle(BarcodeCounterUpdated $event)
     {
-        $prefix    = $this->repository->getPrefix();
-        $barcode   = new Barcode($prefix, $event->counter);
+        $barcode = new Barcode($event->prefix, $event->counter);
         $remaining = $barcode->remainingCodes();
 
-        if ($remaining < config('barcodes.threshold', 100)) {
+        if ($remaining < $this->config->get('barcode.threshold', 100)) {
             Log::critical("Barcodes with Prefix below threshold", [
-                'prefix' => $prefix,
+                'prefix' => $event->prefix,
                 'remaining' => $remaining,
                 'counter' => $event->counter
             ]);
