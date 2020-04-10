@@ -3,6 +3,7 @@
 namespace SimonBowen\Barcode;
 
 use Illuminate\Contracts\Redis\Connection;
+use SimonBowen\Barcode\Events\BarcodeCounterUpdated;
 
 class BarcodeRepository
 {
@@ -28,11 +29,10 @@ class BarcodeRepository
     public function next()
     {
         $next = $this->redis->command('INCR', [$this->counterKey]);
-        $this->redis->publish($this->channelKey, json_encode([
-            'counter' => $next,
-            'prefix' => $this->getPrefix(),
-        ]));
-        return new Barcode($this->getPrefix(), $next);
+        $prefix = $this->getPrefix();
+
+        BarcodeCounterUpdated::dispatch($prefix, $next);
+        return new Barcode($prefix, $next);
     }
 
     /**
