@@ -5,7 +5,6 @@ namespace SimonBowen\Barcode;
 use Illuminate\Contracts\Redis\Connection;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
-use SimonBowen\Barcode\Commands\BarcodeMonitor;
 use SimonBowen\Barcode\Commands\UpdateBarcodePrefix;
 use SimonBowen\Barcode\Events\BarcodeCounterUpdated;
 use SimonBowen\Barcode\Listeners\RemainingBarcodesAvailable;
@@ -16,7 +15,6 @@ class BarcodeServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
-                BarcodeMonitor::class,
                 UpdateBarcodePrefix::class,
             ]);
         }
@@ -33,12 +31,11 @@ class BarcodeServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton(BarcodeRepository::class, function () {
-            $redis      = app(Connection::class);
+            $redis = app(Connection::class);
             $counterKey = config('barcode.keys.counter', 'barcode.counter');
-            $prefixKey  = config('barcode.keys.prefix', 'barcode.prefix');
-            $channelKey = config('barcode.keys.channel', 'barcode.channel');
+            $prefixKey = config('barcode.keys.prefix', 'barcode.prefix');
 
-            return new BarcodeRepository($redis, $counterKey, $prefixKey, $channelKey);
+            return new BarcodeRepository($redis, $counterKey, $prefixKey);
         });
     }
 }

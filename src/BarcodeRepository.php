@@ -11,14 +11,12 @@ class BarcodeRepository
 
     protected string $counterKey;
     protected string $prefixKey;
-    protected string $channelKey;
 
-    public function __construct(Connection $redis, string $counterKey, string $prefixKey, string $channelKey)
+    public function __construct(Connection $redis, string $counterKey, string $prefixKey)
     {
         $this->redis = $redis;
         $this->counterKey = $counterKey;
         $this->prefixKey = $prefixKey;
-        $this->channelKey = $channelKey;
     }
 
     /**
